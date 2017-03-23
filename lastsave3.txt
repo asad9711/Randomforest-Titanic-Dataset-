@@ -1,0 +1,61 @@
+
+R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> library(mice)
+Warning message:
+package ‘mice’ was built under R version 3.3.3 
+> mice_mod<-mice(combine[, !names(combine) %in% c('PassengerId','Survived','Pclass','Name','Sex','SibSp','Parch','Ticket','Fare','Cabin','Embarked')],method='rf')
+Error in mice(combine[, !names(combine) %in% c("PassengerId", "Survived",  : 
+  Data should be a matrix or data frame
+> combine<-as.data.frame(combine)
+> mice_mod<-mice(combine[, !names(combine) %in% c('PassengerId','Survived','Pclass','Name','Sex','SibSp','Parch','Ticket','Fare','Cabin','Embarked')],method='rf')
+Error in mice(combine[, !names(combine) %in% c("PassengerId", "Survived",  : 
+  Data should be a matrix or data frame
+> factor_vars<-c('PassengerId','Survived','Pclass','Name','Sex','SibSp','Parch','Ticket','Fare','Cabin','Embarked')
+> combine[factor_vars]<-lapply(combine[factor_vars],function(x) as.factor(x))
+> set.seed(129)
+> mice_mod<-mice(combine[, !names(combine) %in% c('PassengerId','Survived','Pclass','Name','Sex','SibSp','Parch','Ticket','Fare','Cabin','Embarked')],method='rf')
+Error in mice(combine[, !names(combine) %in% c("PassengerId", "Survived",  : 
+  Data should be a matrix or data frame
+> par(mfrow=c(1,2))
+> hist(combine$Age,freq=F,main='Age:Original data',col='darkgreen',ylim=c(0,0.04))
+> mice_output<-complete(tempData)
+> hist(mice_output$Age,freq=F,main='Age:MICE output',col='lightgreen',ylim=c(0,0.04))
+> combine$Age<-mice_output$Age
+> sum(is.na(combine$Age))
+[1] 0
+> train<-combine[1:891]
+Error in `[.data.frame`(combine, 1:891) : undefined columns selected
+> train<-combine[1:891,]
+> test<-combine[892:1309,]
+> set.seed(754)
+> library(randomForest)
+randomForest 4.6-12
+Type rfNews() to see new features/changes/bug fixes.
+Warning message:
+package ‘randomForest’ was built under R version 3.3.3 
+> rf_model<-randomForest(factor(Survived)~Pclass+Sex+Age,data=train)
+> plot(rf_model,ylim=c(0,0.36))
+> legend('topright',colnames(rf_model$err.rate),col=1:3,fill=1:3)
+> prediction<-predict(rf_model,test)
+> solution<-data.frame(PassengerID=test$PassengerId,Survived=prediction)
+> write.csv(solution,file='solution_randomforest.csv',row.names=F)
+> 
