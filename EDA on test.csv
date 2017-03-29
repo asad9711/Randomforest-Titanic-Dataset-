@@ -1,0 +1,9 @@
+sub1<-train[which(train$Survived==0 & train$Pclass==1),]
+ncount(sub1) =80 # It means that 80 people of 1st class died.
+
+sub2<-train[which(train$Survived==0 & train$Pclass==2),]
+ncount(sub2)=97 # It means that 97 people of 2nd class died.
+
+sub3<-train[which(train$Survived==0 & train$Pclass==3),]
+ncount(sub3) =372 # 372 people of 3rd class died.
+
